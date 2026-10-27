@@ -79,6 +79,7 @@ import com.example.ui.components.OsmMapView
 import com.example.ui.components.RacePodView
 import com.example.ui.components.RouteMapView
 import com.example.ui.components.SpeedOverTimeChart
+import com.example.ui.components.DistanceAverageSpeedTable
 import com.example.ui.components.TripCardView
 import com.example.ui.components.WeatherWidget
 import com.example.ui.theme.MyApplicationTheme
@@ -379,6 +380,12 @@ fun MainScreen(viewModel: MainViewModel) {
                             unit = telemetryState.speedUnit,
                             durationSeconds = telemetryState.tripDurationSeconds,
                             onClose = { activeViewMode = DashboardViewMode.COCKPIT }
+                        )
+
+                        // Keep the existing chart unchanged; append the distance/average-speed table below it.
+                        DistanceAverageSpeedTable(
+                            routePoints = telemetryState.routePoints,
+                            unit = telemetryState.speedUnit
                         )
 
                         // Live Telemetry Breakdown Card
