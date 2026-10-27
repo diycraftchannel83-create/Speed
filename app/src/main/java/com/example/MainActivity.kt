@@ -66,6 +66,7 @@ import com.example.ui.components.BatteryWidget
 import com.example.ui.components.GaugeView
 import com.example.ui.components.GpsMapView
 import com.example.ui.components.GpsPodView
+import com.example.ui.components.OsmMapView
 import com.example.ui.components.LaunchLedBar
 import com.example.ui.components.RacePodView
 import com.example.ui.components.RouteMapView
@@ -186,7 +187,7 @@ fun MainScreen(viewModel: MainViewModel) {
         if (activeViewMode == DashboardViewMode.LIVE_MAP) {
             // FULL LIVE GPS MAP VIEW
             Box(modifier = Modifier.fillMaxSize()) {
-                GpsMapView(
+                OsmMapView(
                     latitude = telemetryState.currentLatitude,
                     longitude = telemetryState.currentLongitude,
                     accuracyMeters = telemetryState.gpsAccuracyMeters,
@@ -196,9 +197,8 @@ fun MainScreen(viewModel: MainViewModel) {
                     headingDegrees = telemetryState.headingDegrees,
                     locationAddress = telemetryState.locationAddress,
                     routePoints = telemetryState.routePoints,
-                    isInteractive = true,
                     showControls = true,
-                    initialZoom = 16
+                    initialZoom = 16.5
                 )
 
                 // Top View Switcher & Trip Status Bar

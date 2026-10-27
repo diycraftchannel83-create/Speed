@@ -61,8 +61,8 @@ fun RouteMapView(
             .background(Color(0xFF030C16))
             .testTag("route_map_screen")
     ) {
-        // Real Geographic Map Layer
-        GpsMapView(
+        // OSMDroid Map Layer
+        OsmMapView(
             latitude = centerLat,
             longitude = centerLng,
             accuracyMeters = 8f,
@@ -72,9 +72,8 @@ fun RouteMapView(
             headingDegrees = 0f,
             locationAddress = title,
             routePoints = routePoints,
-            isInteractive = true,
             showControls = true,
-            initialZoom = 16
+            initialZoom = 16.0
         )
 
         // Top Navigation Bar

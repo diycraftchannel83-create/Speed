@@ -95,9 +95,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     jsonArray.put(obj)
                 }
 
-                val titleFormat = SimpleDateFormat("Ride HH:mm - dd MMM", Locale.getDefault())
+                val timeFormat = SimpleDateFormat("HH:mm - dd MMM", Locale.getDefault())
+                val formattedTime = timeFormat.format(Date(startTime))
                 val trip = TripEntity(
-                    title = titleFormat.format(Date(startTime)),
+                    title = "Ride $formattedTime",
                     startTime = startTime,
                     endTime = endTime,
                     maxSpeedKmh = state.maxSpeedKmh,

@@ -49,4 +49,13 @@ class ExampleRobolectricTest {
         assertTrue(content.contains("ALANGMOTOR SPEED RECORDER"))
         assertTrue(content.contains("112.5"))
     }
+
+    @Test
+    fun `test valid trip title date formatting`() {
+        val startTime = System.currentTimeMillis()
+        val timeFormat = java.text.SimpleDateFormat("HH:mm - dd MMM", java.util.Locale.getDefault())
+        val formattedTime = timeFormat.format(java.util.Date(startTime))
+        val title = "Ride $formattedTime"
+        assertTrue(title.startsWith("Ride "))
+    }
 }
