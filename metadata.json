@@ -1,0 +1,6 @@
+{
+  "name": "Alangmotor",
+  "description": "Precision GPS & accelerometer speedometer with real-time launch telemetry, trip recording, route mapping, and PDF/CSV export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
