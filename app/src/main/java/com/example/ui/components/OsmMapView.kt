@@ -101,6 +101,9 @@ fun OsmMapView(
 ) {
     val context = LocalContext.current
     val isLocked = gpsState == GpsLockState.LOCKED
+    // Do not show a fake marker at the hard-coded Jakarta fallback before a real GPS fix.
+    val hasGpsFix = latitude.isFinite() && longitude.isFinite() &&
+        latitude in -90.0..90.0 && longitude in -180.0..180.0 && accuracyMeters > 0f
 
     var currentTileMode by remember { mutableIntStateOf(0) } // 0: Dark, 1: OSM Street, 2: Satellite
     var isFollowingLocation by remember { mutableStateOf(true) }
@@ -115,7 +118,8 @@ fun OsmMapView(
             setBuiltInZoomControls(false)
             setTileSource(CartoDarkTileSource)
             controller.setZoom(initialZoom)
-            controller.setCenter(GeoPoint(latitude, longitude))
+            // Wait for a real location update before centering on the vehicle.
+            controller.setCenter(if (hasGpsFix) GeoPoint(latitude, longitude) else GeoPoint(0.0, 0.0))
         }
     }
 
@@ -139,10 +143,10 @@ fun OsmMapView(
     }
 
     // Update Vehicle Marker, Accuracy Circle & Route Polyline
-    LaunchedEffect(latitude, longitude, accuracyMeters, headingDegrees, isLocked, routePoints.size) {
+    LaunchedEffect(latitude, longitude, accuracyMeters, headingDegrees, isLocked, routePoints.size, hasGpsFix) {
         mapView.overlays.clear()
 
-        val vehicleGeoPoint = GeoPoint(latitude, longitude)
+        val vehicleGeoPoint = if (hasGpsFix) GeoPoint(latitude, longitude) else null
 
         // 1. Draw Route Polyline
         if (routePoints.size >= 2) {
@@ -156,7 +160,8 @@ fun OsmMapView(
             mapView.overlays.add(polyline)
         }
 
-        // 2. Draw Exact GPS Accuracy Circle in meters
+        // 2. Draw accuracy circle only after Android supplies a real GPS fix.
+        if (vehicleGeoPoint != null) {
         val accuracyCircle = Polygon(mapView).apply {
             points = Polygon.pointsAsCircle(vehicleGeoPoint, (accuracyMeters.coerceAtLeast(5f)).toDouble())
             fillPaint.color = if (isLocked) {
@@ -184,6 +189,7 @@ fun OsmMapView(
 
         if (isFollowingLocation) {
             mapView.controller.animateTo(vehicleGeoPoint)
+        }
         }
 
         mapView.invalidate()
