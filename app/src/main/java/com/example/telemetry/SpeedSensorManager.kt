@@ -73,6 +73,8 @@ data class TelemetryState(
     val batteryPct: Int = 96,
     val weatherTempCelsius: Int = 27,
     val weatherCondition: String = "light rain",
+    val headingDegrees: Float = 0f,
+    val locationAddress: String = "",
     val snapshotCount: Int = 0,
     val routePoints: List<RoutePoint> = emptyList(),
     val isSimulationMode: Boolean = false
@@ -274,6 +276,12 @@ class SpeedSensorManager(
             previousState.routePoints
         }
 
+        val heading = if (location.hasBearing() && location.bearing != 0f) {
+            location.bearing
+        } else {
+            previousState.headingDegrees
+        }
+
         _telemetryState.update {
             it.copy(
                 currentSpeedKmh = currentSpeed,
@@ -285,8 +293,14 @@ class SpeedSensorManager(
                 currentLatitude = location.latitude,
                 currentLongitude = location.longitude,
                 altitudeMeters = location.altitude,
+                headingDegrees = heading,
                 routePoints = updatedRoute
             )
+        }
+
+        // Asynchronously resolve address if empty or every ~100m
+        if (previousState.locationAddress.isEmpty() || addedDistance > 100.0) {
+            resolveAddress(location.latitude, location.longitude)
         }
 
         // Trigger drag launch sequence when GPS locks on first time
@@ -319,6 +333,33 @@ class SpeedSensorManager(
             if (sprintDist >= 402.0 && _telemetryState.value.race402m == null) {
                 _telemetryState.update { it.copy(race402m = elapsedSec) }
             }
+        }
+    }
+
+    private fun resolveAddress(lat: Double, lng: Double) {
+        scope.launch(Dispatchers.IO) {
+            try {
+                if (android.location.Geocoder.isPresent()) {
+                    val geocoder = android.location.Geocoder(context, java.util.Locale.getDefault())
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        geocoder.getFromLocation(lat, lng, 1) { addresses ->
+                            val addr = addresses.firstOrNull()
+                            val name = addr?.thoroughfare ?: addr?.subLocality ?: addr?.locality ?: addr?.subAdminArea ?: ""
+                            if (name.isNotEmpty()) {
+                                _telemetryState.update { it.copy(locationAddress = name) }
+                            }
+                        }
+                    } else {
+                        @Suppress("DEPRECATION")
+                        val addresses = geocoder.getFromLocation(lat, lng, 1)
+                        val addr = addresses?.firstOrNull()
+                        val name = addr?.thoroughfare ?: addr?.subLocality ?: addr?.locality ?: addr?.subAdminArea ?: ""
+                        if (name.isNotEmpty()) {
+                            _telemetryState.update { it.copy(locationAddress = name) }
+                        }
+                    }
+                }
+            } catch (_: Exception) {}
         }
     }
 
