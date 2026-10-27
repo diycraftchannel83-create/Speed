@@ -33,6 +33,7 @@ import com.example.telemetry.GpsLockState
 fun GpsPodView(
     gpsState: GpsLockState,
     accuracyMeters: Float,
+    unit: String = "km/h",
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -113,8 +114,13 @@ fun GpsPodView(
                 letterSpacing = 1.sp
             )
 
+            val isImperial = unit == "mph"
             val displayAccuracy = if (isLocked) {
-                if (accuracyMeters > 0) accuracyMeters.toInt().toString() else "8"
+                if (accuracyMeters > 0) {
+                    if (isImperial) (accuracyMeters * 3.28084f).toInt().toString() else accuracyMeters.toInt().toString()
+                } else {
+                    if (isImperial) "25" else "8"
+                }
             } else {
                 "--"
             }
@@ -127,7 +133,7 @@ fun GpsPodView(
             )
 
             Text(
-                text = if (isLocked) "m" else "search",
+                text = if (isLocked) (if (isImperial) "ft" else "m") else "search",
                 color = Color(0xFF90A4AE),
                 fontSize = 10.sp,
                 fontWeight = FontWeight.SemiBold

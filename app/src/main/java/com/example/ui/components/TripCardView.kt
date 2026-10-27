@@ -60,7 +60,7 @@ fun TripCardView(
     } else {
         (distanceMeters / 1000.0) * 0.621371
     }
-    val distUnitLabel = if (unit == "km/h") "km" else "mi"
+    val distUnitLabel = if (unit == "km/h") "km" else "mil"
 
     val hours = durationSeconds / 3600
     val minutes = (durationSeconds % 3600) / 60
@@ -114,6 +114,23 @@ fun TripCardView(
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 0.5.sp
             )
+
+            if (isRecording && !isPaused) {
+                Spacer(modifier = Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Color(0x3300E676))
+                        .padding(horizontal = 5.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "☀️ NO SLEEP",
+                        color = Color(0xFF00E676),
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Black
+                    )
+                }
+            }
         }
 
         Spacer(modifier = Modifier.height(2.dp))

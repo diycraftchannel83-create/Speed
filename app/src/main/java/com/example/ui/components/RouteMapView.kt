@@ -46,6 +46,7 @@ fun RouteMapView(
     maxSpeed: Float,
     avgSpeed: Float,
     distanceMeters: Double,
+    unit: String = "km/h",
     onBack: () -> Unit,
     onExportPdf: () -> Unit,
     onExportCsv: () -> Unit,
@@ -153,13 +154,19 @@ fun RouteMapView(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 // Stats Row
+                val isImperial = unit != "km/h"
+                val distMult = if (isImperial) 0.000621371 else 0.001
+                val distLabel = if (isImperial) "mil" else "km"
+                val speedMult = if (isImperial) 0.621371f else 1f
+                val speedLabel = if (isImperial) "mph" else "km/h"
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    MetricColumn("JARAK", String.format(Locale.US, "%.2f km", distanceMeters / 1000.0), Color(0xFF00E5FF))
-                    MetricColumn("TOP SPEED", String.format(Locale.US, "%.1f km/h", maxSpeed), Color(0xFFFF1744))
-                    MetricColumn("RATA-RATA", String.format(Locale.US, "%.1f km/h", avgSpeed), Color(0xFFFF9100))
+                    MetricColumn("JARAK", String.format(Locale.US, "%.2f %s", distanceMeters * distMult, distLabel), Color(0xFF00E5FF))
+                    MetricColumn("TOP SPEED", String.format(Locale.US, "%.1f %s", maxSpeed * speedMult, speedLabel), Color(0xFFFF1744))
+                    MetricColumn("RATA-RATA", String.format(Locale.US, "%.1f %s", avgSpeed * speedMult, speedLabel), Color(0xFFFF9100))
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
