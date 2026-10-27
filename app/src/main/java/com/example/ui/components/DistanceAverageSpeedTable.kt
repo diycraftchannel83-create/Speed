@@ -72,7 +72,16 @@ fun DistanceAverageSpeedTable(routePoints: List<RoutePoint>, unit: String, modif
             }
             rows.forEach { row ->
                 Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 11.dp)) {
-                    Text("\${row.distanceMeters.toInt()} m", modifier = Modifier.weight(1f), color = Color.White, fontSize = 14.sp)
+                    Text("${'", modifier = Modifier.weight(1f), color = Color.White, fontSize = 14.sp)
+                    Text(text = row.averageSpeedKmh?.let { String.format(Locale.US, "%.2f %s", it * multiplier, speedLabel) } ?: "—",
+                        modifier = Modifier.weight(1.5f), color = if (row.averageSpeedKmh == null) Color(0xFF78909C) else Color(0xFFFFB74D),
+                        fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
+        }
+    }
+}
+}{row.distanceMeters.toInt()} m", modifier = Modifier.weight(1f), color = Color.White, fontSize = 14.sp)
                     Text(text = row.averageSpeedKmh?.let { String.format(Locale.US, "%.2f %s", it * multiplier, speedLabel) } ?: "—",
                         modifier = Modifier.weight(1.5f), color = if (row.averageSpeedKmh == null) Color(0xFF78909C) else Color(0xFFFFB74D),
                         fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
